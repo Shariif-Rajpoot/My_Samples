@@ -35,7 +35,8 @@ string User::getUserPassword()
 {
 	return password;
 }
-// second class
+// second class an abstract class
+// we have here hierarchical inheritance.
 class UserManager
 {
 protected:
@@ -44,7 +45,7 @@ protected:
 public:
 	void registerUser();
 	void loginUser(string, string);
-	void showUserList();
+	virtual void showUserList() = 0; // pure virtual function
 	void searchUser(string);
 };
 // third class
@@ -52,6 +53,7 @@ class AdminUser : public UserManager
 {
 public:
 	void addNewUser();
+	void showUserList(); // function overriding
 	void deleteUser(string);
 };
 // fourth class
@@ -59,6 +61,7 @@ class RegularUser : public UserManager
 {
 public:
 	void logout(string);
+	void showUserList(); // function overriding
 };
 // classes end
 void UserManager::registerUser()
@@ -136,18 +139,6 @@ void UserManager::loginUser(string name, string pass)
 		}
 	}
 }
-void UserManager::showUserList()
-{
-	cout << endl;
-	cout << "\t\t\t|===============================|" << endl;
-	cout << "\t\t\t|==========Login User's=========|" << endl;
-	cout << "\t\t\t|===============================|" << endl;
-	cout << endl;
-	for (int i = 0; i < user.size(); i++)
-	{
-		cout << "\t\t\t| === User Number = = = => " << i + 1 << " => " << user[i].getUserName() << endl;
-	}
-}
 void UserManager::searchUser(string userName)
 {
 	for (int i = 0; i < user.size(); i++)
@@ -163,23 +154,27 @@ void UserManager::searchUser(string userName)
 void AdminUser::deleteUser(string name)
 {
 	ofstream ofs;
-	ofs.open("Total_Users.txt", ios::app); // opening file in append mode
-	for (int i = 0; i < user.size(); i++)
+	ofs.open("Total_Users.txt", ios::app);
+	string Name, password;
+	ifstream ifs;
+	ifs.open("registerUsers.txt");
+	ifs >> Name >> password;
+	for (; !ifs.eof();)
 	{
-		if (user[i].getUserName() == name)
+		if (Name == name)
 		{
-			user.erase(user.begin() + i);
-			cout << "\t\t\tUser " << name << " is deleted successfully " << endl;
-			// break;
+			cout << "\t\t\tUser " << Name << " is deleted successfully " << endl;
 		}
 		else
 		{
-			ofs << "User ==="
-				<< "Password" << endl;
-			ofs << user[i].getUserName() << "==" << user[i].getUserPassword() << endl;
+			ofs << Name << " " << password << endl;
 		}
+		ifs >> Name >> password;
 	}
+	ifs.close();
 	ofs.close();
+	remove("registerUsers.txt");
+	rename("Total_Users.txt", "registerUsers.txt");
 }
 
 void AdminUser::addNewUser()
@@ -222,27 +217,62 @@ label:
 	cout << "\t\tUser added successfully " << endl
 		 << endl;
 }
+void AdminUser::showUserList()
+{
+	cout << endl;
+	cout << "\t\t\t|===============================|" << endl;
+	cout << "\t\t\t|==========Login User's=========|" << endl;
+	cout << "\t\t\t|===============================|" << endl;
+	cout << endl;
+	string name, password;
+	ifstream ifs("registerUsers.txt");
+	ifs >> name >> password;
+	int i = 0;
+	for (; !ifs.eof(); i++)
+	{
+		cout << "\t\t\t| === User Number = = = => " << i + 1 << " => "
+			 << "\n\t\tName =>" << name << "\n\t\tPassword => " << password << endl;
+		ifs >> name >> password;
+	}
+	ifs.close();
+}
 // fourth class
 void RegularUser::logout(string name)
 {
 	ofstream ofs;
 	ofs.open("Total_Users.txt", ios::app);
-	for (int i = 0; i < user.size(); i++)
+	string Name, password;
+	ifstream ifs;
+	ifs.open("registerUsers.txt");
+	ifs >> Name >> password;
+	for (; !ifs.eof();)
 	{
-		if (user[i].getUserName() == name)
+		if (Name == name)
 		{
-			user.erase(user.begin() + i);
-			cout << "\t\t\tUser " << name << " is logout successfully " << endl;
-			// break;
+			cout << "\t\t\tUser " << Name << " is logout successfully " << endl;
 		}
 		else
 		{
-			ofs << "User ==="
-				<< "Password" << endl;
-			ofs << user[i].getUserName() << "==" << user[i].getUserPassword() << endl;
+			ofs << Name << " " << password << endl;
 		}
+		ifs >> Name >> password;
 	}
+	ifs.close();
 	ofs.close();
+	remove("registerUsers.txt");
+	rename("Total_Users.txt", "registerUsers.txt");
+}
+void RegularUser::showUserList()
+{
+	cout << endl;
+	cout << "\t\t\t|===============================|" << endl;
+	cout << "\t\t\t|==========Login User's=========|" << endl;
+	cout << "\t\t\t|===============================|" << endl;
+	cout << endl;
+	for (int i = 0; i < user.size(); i++)
+	{
+		cout << "\t\t\t| === User Number = = = => " << i + 1 << " => " << user[i].getUserName() << endl;
+	}
 }
 // main function
 int main()
@@ -329,7 +359,9 @@ int adminMenu()
 }
 void adminRights()
 {
+	UserManager *userManager; // an abstract class pointer
 	AdminUser newUser;
+	userManager = &newUser; // pointing to the address of child class
 	string password;
 	string email;
 	cout << endl
@@ -366,7 +398,7 @@ void adminRights()
 		}
 		case 3:
 		{
-			newUser.showUserList();
+			userManager->showUserList(); // achieving runtime polymorphism
 			break;
 		}
 		case 4:
@@ -412,7 +444,9 @@ void adminRights()
 }
 void regularUserRights()
 {
+	UserManager *userManager; // base class pointer
 	RegularUser newUser;
+	userManager = &newUser; // pointing to the address of child class
 label:
 	int option = regularUserMenu();
 	switch (option)
@@ -435,7 +469,7 @@ label:
 	}
 	case 3:
 	{
-		newUser.showUserList();
+		userManager->showUserList(); // achieving runtime polymorphism
 		break;
 	}
 	case 4:
