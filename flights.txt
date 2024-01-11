@@ -1,0 +1,9 @@
+=========================================
+==============PAK_AIRLINES===============
+================Tickets==================
+=========================================
+Customes ID     ==> 1
+Customes NAME   ==> Muhammad_Mohsin
+Customes GENDER ==> Male
+Destination 		Australia
+Flight cost 		9000
