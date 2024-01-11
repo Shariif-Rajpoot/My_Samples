@@ -3,11 +3,11 @@
 #include <string.h>
 #include <vector>
 using namespace std;
-int checkUser();       // prototype
-int adminMenu();       // prototype
-int regularUserMenu(); // prototype
-void adminRights();
-void regularUserRights();
+int checkUser();          // prototype( to check the user, admin or regular by giving choice)
+int adminMenu();          // prototype( if user is admin, some access will be provided to it)
+int regularUserMenu();    // prototype( if user is regular, some access will be provided to it)
+void adminRights();       // prototype (to specify all the operation for admin to perform)
+void regularUserRights(); // prototype (to specify all the operations for regular user to perform)
 // first class
 class User
 {
@@ -77,7 +77,7 @@ label: // jump statement
     cin >> userName;
     cout << "\tEnter the password  => ";
     cin >> password;
-    ifstream ifs;
+    ifstream ifs; // for writing data from file
     ifs.open("registerUsers.txt");
     string name, pass;
     for (; !ifs.eof();)
@@ -89,10 +89,10 @@ label: // jump statement
             goto label;
         }
     }
-    ifs.close();
-    // creating the file
+    ifs.close(); // closing the file
+    // creating the file for reading data init
     ofstream ofs;
-    ofs.open("registerUsers.txt", ios::app);
+    ofs.open("registerUsers.txt", ios::app); // in append mode
     if (ofs.is_open())
     {
         // ofs << "\t\t\tData of register user is below " << endl
@@ -109,7 +109,7 @@ label: // jump statement
     ofs.close(); // closing the file
     User newUser_1;
     newUser_1 = User(userName, password);
-    user.push_back(newUser_1);
+    user.push_back(newUser_1); // build in function to store data in array of selected type
     cout << endl;
     cout << "\t\tUser registered successfully " << endl
          << endl;
@@ -163,7 +163,7 @@ void UserManager::searchUser(string userName)
 void AdminUser::deleteUser(string name)
 {
     ofstream ofs;
-    ofs.open("Total_Users.txt", ios::app);
+    ofs.open("Total_Users.txt", ios::app); // opening file in append mode
     for (int i = 0; i < user.size(); i++)
     {
         if (user[i].getUserName() == name)
@@ -244,6 +244,7 @@ void RegularUser::logout(string name)
     }
     ofs.close();
 }
+// main function
 int main()
 {
     int getUser = checkUser();
@@ -272,7 +273,7 @@ int main()
     return 0;
 }
 
-// functions
+// function definitions
 int checkUser()
 {
     int choice;

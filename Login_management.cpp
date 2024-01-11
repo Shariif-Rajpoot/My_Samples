@@ -3,11 +3,11 @@
 #include <string.h>
 #include <vector>
 using namespace std;
-int checkUser();	   // prototype
-int adminMenu();	   // prototype
-int regularUserMenu(); // prototype
-void adminRights();
-void regularUserRights();
+int checkUser();		  // prototype( to check the user, admin or regular by giving choice)
+int adminMenu();		  // prototype( if user is admin, some access will be provided to it)
+int regularUserMenu();	  // prototype( if user is regular, some access will be provided to it)
+void adminRights();		  // prototype (to specify all the operation for admin to perform)
+void regularUserRights(); // prototype (to specify all the operations for regular user to perform)
 // first class
 class User
 {
@@ -63,6 +63,7 @@ public:
 // classes end
 void UserManager::registerUser()
 {
+label: // jump statement
 	cout << endl
 		 << endl;
 	cout << "\t\t\t|==============================================|" << endl;
@@ -76,15 +77,28 @@ void UserManager::registerUser()
 	cin >> userName;
 	cout << "\tEnter the password  => ";
 	cin >> password;
-	// creating the file
+	ifstream ifs; // for writing data from file
+	ifs.open("registerUsers.txt");
+	string name, pass;
+	for (; !ifs.eof();)
+	{
+		ifs >> name >> pass;
+		if (name == userName || password == pass)
+		{
+			cout << "\t\t\tAlready User exits with same name or  password try another" << endl;
+			goto label;
+		}
+	}
+	ifs.close(); // closing the file
+	// creating the file for reading data init
 	ofstream ofs;
-	ofs.open("registerUsers.txt", ios::app);
+	ofs.open("registerUsers.txt", ios::app); // in append mode
 	if (ofs.is_open())
 	{
-		ofs << "\t\t\tData of all the enter user is below " << endl
-			<< endl;
-		ofs << "User "
-			<< " Password" << endl;
+		// ofs << "\t\t\tData of register user is below " << endl
+		//     << endl;
+		// ofs << "User "
+		//     << " Password" << endl;
 		ofs << userName << " " << password << endl;
 		cout << endl;
 	}
@@ -95,7 +109,7 @@ void UserManager::registerUser()
 	ofs.close(); // closing the file
 	User newUser_1;
 	newUser_1 = User(userName, password);
-	user.push_back(newUser_1);
+	user.push_back(newUser_1); // build in function to store data in array of selected type
 	cout << endl;
 	cout << "\t\tUser registered successfully " << endl
 		 << endl;
@@ -118,11 +132,7 @@ void UserManager::loginUser(string name, string pass)
 			cout << "\t\t\t|======Login Successfully=======|" << endl;
 			cout << "\t\t\t|===============================|" << endl;
 			cout << endl;
-		}
-		else
-		{
-			cout << endl;
-			cout << "\t\tDear Invalid Username or Password" << endl;
+			break;
 		}
 	}
 }
@@ -152,19 +162,29 @@ void UserManager::searchUser(string userName)
 // third class object
 void AdminUser::deleteUser(string name)
 {
+	ofstream ofs;
+	ofs.open("Total_Users.txt", ios::app); // opening file in append mode
 	for (int i = 0; i < user.size(); i++)
 	{
 		if (user[i].getUserName() == name)
 		{
 			user.erase(user.begin() + i);
-			cout << "\t\t\tUser " << name << " is removed successfully " << endl;
-			break;
+			cout << "\t\t\tUser " << name << " is deleted successfully " << endl;
+			// break;
+		}
+		else
+		{
+			ofs << "User ==="
+				<< "Password" << endl;
+			ofs << user[i].getUserName() << "==" << user[i].getUserPassword() << endl;
 		}
 	}
+	ofs.close();
 }
 
 void AdminUser::addNewUser()
 {
+label:
 	cout << endl
 		 << endl;
 	cout << "\t\t\t|==============================================|" << endl;
@@ -178,6 +198,23 @@ void AdminUser::addNewUser()
 	cin >> userName;
 	cout << "\tEnter the password  => ";
 	cin >> password;
+	ifstream ifs;
+	ifs.open("registerUsers.txt");
+	string name, pass;
+	for (; !ifs.eof();)
+	{
+		ifs >> name >> pass;
+		if (name == userName || password == pass)
+		{
+			cout << "\t\t\tAlready User exits with same name or  password try another" << endl;
+			goto label;
+		}
+	}
+	ifs.close();
+	ofstream ofs;
+	ofs.open("registerUsers.txt", ios::app);
+	ofs << userName << " " << password << endl;
+	ofs.close();
 	User newUser_1;
 	newUser_1 = User(userName, password);
 	user.push_back(newUser_1);
@@ -189,22 +226,25 @@ void AdminUser::addNewUser()
 void RegularUser::logout(string name)
 {
 	ofstream ofs;
-	ofs.open("removedUser.txt", ios::app);
+	ofs.open("Total_Users.txt", ios::app);
 	for (int i = 0; i < user.size(); i++)
 	{
 		if (user[i].getUserName() == name)
 		{
 			user.erase(user.begin() + i);
-			ofs << "\t\tList of logout users" << endl
-				<< endl;
+			cout << "\t\t\tUser " << name << " is logout successfully " << endl;
+			// break;
+		}
+		else
+		{
 			ofs << "User ==="
 				<< "Password" << endl;
 			ofs << user[i].getUserName() << "==" << user[i].getUserPassword() << endl;
-			cout << "\t\t\tUser " << name << " is logout successfully " << endl;
-			break;
 		}
 	}
+	ofs.close();
 }
+// main function
 int main()
 {
 	int getUser = checkUser();
@@ -233,7 +273,7 @@ int main()
 	return 0;
 }
 
-// functions
+// function definitions
 int checkUser()
 {
 	int choice;
