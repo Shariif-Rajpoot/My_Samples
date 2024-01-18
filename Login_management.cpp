@@ -1,7 +1,8 @@
-#include <iostream>
-#include <fstream>
+
+#include <iostream> //for input and output
+#include <fstream>	//for file operation's
 #include <string.h>
-#include <vector>
+#include <vector> //stl standard template library
 using namespace std;
 int checkUser();		  // prototype( to check the user, admin or regular by giving choice)
 int adminMenu();		  // prototype( if user is admin, some access will be provided to it)
@@ -80,8 +81,8 @@ label: // jump statement
 	cin >> userName;
 	cout << "\tEnter the password  => ";
 	cin >> password;
-	ifstream ifs; // for writing data from file
-	ifs.open("registerUsers.txt");
+	ifstream ifs;				   // for writing data from file
+	ifs.open("registerUsers.txt"); // to open the file
 	string name, pass;
 	for (; !ifs.eof();)
 	{
@@ -262,6 +263,7 @@ void RegularUser::logout(string name)
 	remove("registerUsers.txt");
 	rename("Total_Users.txt", "registerUsers.txt");
 }
+
 void RegularUser::showUserList()
 {
 	cout << endl;
